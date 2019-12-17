@@ -1,3 +1,5 @@
+image:
+  file: .gitpod.dockerfile
 vscode:
   extensions:
     - esbenp.prettier-vscode@3.11.0:dtH/6/5jWFfhGTzgegTeyg==
