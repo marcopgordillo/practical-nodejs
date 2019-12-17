@@ -4,14 +4,14 @@ const express = require('express'),
       mongoClient = require('mongodb').MongoClient
       routes = require('./routes')
 
-const dbUrl = process.env.DATABASE_URL || 'mongodb://@localhost:27017'
+const dbUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017'
 
-let collections = {}
+let collections
 
 mongoClient.connect(dbUrl, {useUnifiedTopology: true}, (err, client) => {
   if (err) throw err
 
-  const db = client.db('blog')
+  const db = client.db(process.env.DATABASE_NAME)
 
   collections = {
     articles: db.collection('articles'),
