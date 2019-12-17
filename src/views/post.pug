@@ -7,16 +7,16 @@ block content
     div= error
     div.col-md-8
       form(action="/post", method="POST", role="form")
-        div.form-group
+        .form-group
           label(for="title") Title
           input#title.form-control(name="title", type="text", placeholder="JavaScript is good")
-        div.form-group
+        .form-group
           label(for="slug") Slug
           input#slug.form-control(name="slug", type="text", placeholder="js-good")
           span.help-block This string will be used in the URL.
-        div.form-group
+        .form-group
           label(for="text") Text
           textarea#text.form-control(rows="5", name="text", placeholder="Text")
-        p
+        .form-group
           button.btn.btn-primary(type="submit") Save
           
