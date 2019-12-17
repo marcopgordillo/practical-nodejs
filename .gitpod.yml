@@ -1,3 +1,13 @@
 vscode:
   extensions:
     - esbenp.prettier-vscode@3.11.0:dtH/6/5jWFfhGTzgegTeyg==
+image:
+  file: docker/Dockerfile
+tasks:
+  - command: >
+      echo DATABASE_URL=$DATABASE_URL >> .env &&
+      echo ROCKET_ADDRESS=$ROCKET_ADDRESS >> .env &&
+      echo ROCKET_PORT=$ROCKET_PORT >> .env &&
+      mongod
+ports:
+ - port: 27017
