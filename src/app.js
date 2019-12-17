@@ -1,11 +1,12 @@
-const express = require('express')
-const routes = require('./routes')
-const http = require('http')
-const path = require('path')
-const mongoskin = require('mongoskin')
-const dbUrl = process.env.MONGOHQ_URL || 'mongodb://@localhost:27017/blog'
+const express = require('express'),
+      http = require('http'),
+      path = require('path'),
+      mongoskin = require('mongoskin')
+      routes = require('./routes')
 
-const db = mongoskin.db(dbUrl)
+const dbUrl = `${process.env.DATABASE_URL}/blog` || 'mongodb://@localhost:27017/blog'
+
+const db = mongoskin.db(dbUrl, {safe:true})
 const collections = {
   articles: db.collection('articles'),
   users: db.collection('users')
@@ -13,13 +14,13 @@ const collections = {
 
 // const cookieParser = require('cookie-parser')
 // const session = require('express-session')
-const logger = require('morgan')
-const errorHandler = require('errorhandler')
-const bodyParser = require('body-parser')
-const methodOverride = require('method-override')
+const logger = require('morgan'),
+      errorHandler = require('errorhandler'),
+      bodyParser = require('body-parser'),
+      methodOverride = require('method-override')
 
 const app = express()
-app.locals.appTitle = 'blog-express'
+app.locals.appTitle = 'Blog Express'
 
 // Expose collections to request handlers
 app.use((req, res, next) => {
