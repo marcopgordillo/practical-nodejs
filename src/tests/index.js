@@ -4,8 +4,10 @@ const port = require('../app').port
 const superagent = require('superagent')
 const expect = require('expect.js')
 
+const path = require('path')
+
 // TODO: seed from the test and then clean up
-const seedArticles = require('../db/articles.json')
+const seedArticles = require(path.join(__dirname, '../db/articles.json'))
 // const seedUsers = require('../db/users.json')
 
 describe('server', () => {
