@@ -1,23 +1,15 @@
 const express = require('express'),
       http = require('http'),
       path = require('path'),
-      mongoClient = require('mongodb').MongoClient
-      routes = require('./routes')
+      mongo = require(path.join(__dirname, './core/db/mongo')),
+      routes = require(path.join(__dirname, './routes')),
+      constants = require(path.join(__dirname, './constants'))
 
-const dbUrl = process.env.DATABASE_URL || 'mongodb://localhost:27017'
+const db = mongo.db(constants.DATABASE_URL, constants.DATABASE_NAME)
 
-let collections
+let collections = {}
 
-mongoClient.connect(dbUrl, {useUnifiedTopology: true}, (err, client) => {
-  if (err) throw err
-
-  const db = client.db(process.env.DATABASE_NAME)
-
-  collections = {
-    articles: db.collection('articles'),
-    users: db.collection('users')
-  }
-})
+mongo.collections(db, ['articles', 'users'], collections)
 
 // const cookieParser = require('cookie-parser')
 // const session = require('express-session')
