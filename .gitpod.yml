@@ -6,4 +6,5 @@ vscode:
 tasks:
   - command: >
       echo DATABASE_URL=$DATABASE_URL >> .env &&
-      mkdir -p /workspace/data && mongod --dbpath /workspace/data
+      echo DATABASE_NAME=$DATABASE_NAME >> .env &&
+      mkdir -p /workspace/data && mongod --dbpath /workspace/data &
