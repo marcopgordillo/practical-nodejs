@@ -1,16 +1,23 @@
 const express = require('express'),
       http = require('http'),
       path = require('path'),
-      mongoskin = require('mongoskin')
+      mongoClient = require('mongodb').MongoClient
       routes = require('./routes')
 
-const dbUrl = `${process.env.DATABASE_URL}/blog` || 'mongodb://@localhost:27017/blog'
+const dbUrl = process.env.DATABASE_URL || 'mongodb://@localhost:27017'
 
-const db = mongoskin.db(dbUrl, {safe:true})
-const collections = {
-  articles: db.collection('articles'),
-  users: db.collection('users')
-}
+let collections = {}
+
+mongoClient.connect(dbUrl, {useUnifiedTopology: true}, (err, client) => {
+  if (err) throw err
+
+  const db = client.db('blog')
+
+  collections = {
+    articles: db.collection('articles'),
+    users: db.collection('users')
+  }
+})
 
 // const cookieParser = require('cookie-parser')
 // const session = require('express-session')
