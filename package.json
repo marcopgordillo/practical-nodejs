@@ -26,10 +26,10 @@
     "superagent": "^5.1.2"
   },
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "nodemon ./src/app.js",
     "seed": "make db",
     "test": "make test",
-    "st": "standard app.js && standard tests/index.js && standard routes/*"
+    "st": "standard ./src/app.js && standard ./src/tests/index.js && standard ./src/routes/*"
   },
   "repository": {
     "type": "git",
