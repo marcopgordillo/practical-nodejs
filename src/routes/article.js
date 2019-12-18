@@ -1,4 +1,5 @@
 const path = require('path')
+ObjectID = require('mongodb').ObjectID
 const mongo = require(path.join(__dirname, '../core/db/mongo'))
 /*
  * GET article page.
@@ -45,11 +46,13 @@ exports.add = (req, res, next) => {
 
 exports.edit = (req, res, next) => {
   if (!req.params.id) return next(new Error('No article ID.'))
-  req.collections.articles.updateOne({ _id: req.params.id }, { $set: req.body.article }, (error, count) => {
-    if (error) return next(error)
-    res.send({ affectedCount: count })
-  })
-}
+  
+  req.collections.articles.updateOne({ _id: new ObjectID(req.params.id) }, { $set: req.body.article })
+    .then((count) => {
+      res.send({ affectedCount: count })
+    })
+    .catch((err) => console.error(err))
+  }
 
 /*
  * DELETE article API.
