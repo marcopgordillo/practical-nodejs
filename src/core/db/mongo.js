@@ -30,8 +30,13 @@ exports.close = (client) => {
   }
 }
 
-exports.list = (collection, cb) => {
+exports.list = (collection, cb, query = {}) => {
   collection
-    .find({ published: true }, { sort: { _id: -1 } })
-    .toArray((err, articles) => cb(err, articles))
+    .find(query, { sort: { _id: -1 } })
+    .toArray(cb)
+}
+
+exports.getBySlug = (collection, slug, cb) => {
+  collection
+    .findOne({ slug }, cb)
 }

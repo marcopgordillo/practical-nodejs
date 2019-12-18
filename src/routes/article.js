@@ -1,10 +1,13 @@
+const path = require('path')
+const mongo = require(path.join(__dirname, '../core/db/mongo'))
 /*
  * GET article page.
  */
 
 exports.show = (req, res, next) => {
   if (!req.params.slug) return next(new Error('No article slug.'))
-  req.collections.articles.findOne({ slug: req.params.slug }, (error, article) => {
+
+  mongo.getBySlug(req.collections.articles, req.params.slug, (error, article) => {
     if (error) return next(error)
     if (!article.published) return res.status(401).send()
     res.render('article', article)
@@ -16,9 +19,9 @@ exports.show = (req, res, next) => {
  */
 
 exports.list = (req, res, next) => {
-  req.collections.articles.find({}).toArray((error, articles) => {
-    if (error) return next(error)
-    res.send({ articles: articles })
+  mongo.list(req.collections.articles, (err, articles) => {
+    if (err) return next(error)
+    res.send({ articles })
   })
 }
 
@@ -93,8 +96,8 @@ exports.postArticle = (req, res, next) => {
  */
 
 exports.admin = (req, res, next) => {
-  req.collections.articles.find({}, { sort: { _id: -1 } }).toArray((error, articles) => {
-    if (error) return next(error)
-    res.render('admin', { articles: articles })
+  mongo.list(req.collections.articles, (err, articles) => {
+    if (err) return next(error)
+    res.render('admin', { articles })
   })
 }
