@@ -11,8 +11,8 @@ const collections = {}
 
 mongo.collections(db, ['articles', 'users'], collections)
 
-// const cookieParser = require('cookie-parser')
-// const session = require('express-session')
+const cookieParser = require('cookie-parser')
+const session = require('express-session')
 const logger = require('morgan')
 const errorHandler = require('errorhandler')
 const bodyParser = require('body-parser')
@@ -41,6 +41,32 @@ app.use(methodOverride())
 app.use(require('stylus').middleware(path.join(__dirname, 'public')))
 app.use(express.static(path.join(__dirname, 'public')))
 
+// Other midleware
+app.use(cookieParser('3CCC4ACD-6ED1-4844-9217-82131BDCB239'))
+app.use(session(
+  {
+    secret: '2C44774A-D649-4D44-9535-46E296EF984F',
+    resave: true,
+    saveUninitialized: true
+  }
+))
+
+// Authentication middleware
+app.use((req, res, next) => {
+  if (req.session && req.session.admin) {
+    res.locals.admin = true
+  }
+  next()
+})
+
+// Authorization Middleware
+const authorize = (req, res, next) => {
+  if (req.session && req.session.admin)
+    return next()
+  else
+    return res.status(401).send()
+}
+
 // development only
 if (app.get('env') === 'development') {
   app.use(errorHandler('dev'))
@@ -51,12 +77,13 @@ app.get('/', routes.index)
 app.get('/login', routes.user.login)
 app.post('/login', routes.user.authenticate)
 app.get('/logout', routes.user.logout)
-app.get('/admin', routes.article.admin)
-app.get('/post', routes.article.post)
-app.post('/post', routes.article.postArticle)
+app.get('/admin', authorize, routes.article.admin)
+app.get('/post', authorize, routes.article.post)
+app.post('/post', authorize, routes.article.postArticle)
 app.get('/articles/:slug', routes.article.show)
 
 // REST API routes
+app.all('/api', authorize)
 app.get('/api/articles', routes.article.list)
 app.post('/api/articles', routes.article.add)
 app.put('/api/articles/:id', routes.article.edit)
