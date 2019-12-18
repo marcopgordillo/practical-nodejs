@@ -42,7 +42,7 @@ exports.add = (req, res, next) => {
 
 exports.edit = (req, res, next) => {
   if (!req.params.id) return next(new Error('No article ID.'))
-  req.collections.articles.updateById(req.params.id, { $set: req.body.article }, (error, count) => {
+  req.collections.articles.updateOne({ _id: req.params.id }, { $set: req.body.article }, (error, count) => {
     if (error) return next(error)
     res.send({ affectedCount: count })
   })
