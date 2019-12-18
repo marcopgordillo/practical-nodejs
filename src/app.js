@@ -1,22 +1,22 @@
-const express = require('express'),
-      http = require('http'),
-      path = require('path'),
-      mongo = require(path.join(__dirname, './core/db/mongo')),
-      routes = require(path.join(__dirname, './routes')),
-      constants = require(path.join(__dirname, './constants'))
+const express = require('express')
+const http = require('http')
+const path = require('path')
+const mongo = require(path.join(__dirname, './core/db/mongo'))
+const routes = require(path.join(__dirname, './routes'))
+const constants = require(path.join(__dirname, './constants'))
 
 const db = mongo.db(constants.DATABASE_URL, constants.DATABASE_NAME)
 
-let collections = {}
+const collections = {}
 
 mongo.collections(db, ['articles', 'users'], collections)
 
 // const cookieParser = require('cookie-parser')
 // const session = require('express-session')
-const logger = require('morgan'),
-      errorHandler = require('errorhandler'),
-      bodyParser = require('body-parser'),
-      methodOverride = require('method-override')
+const logger = require('morgan')
+const errorHandler = require('errorhandler')
+const bodyParser = require('body-parser')
+const methodOverride = require('method-override')
 
 const app = express()
 app.locals.appTitle = 'Blog Express'
@@ -36,7 +36,7 @@ app.set('view engine', 'pug')
 // Express.js middleware configuration
 app.use(logger('dev'))
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(methodOverride())
 app.use(require('stylus').middleware(path.join(__dirname, 'public')))
 app.use(express.static(path.join(__dirname, 'public')))
@@ -67,7 +67,7 @@ app.all('*', (req, res) => {
 })
 
 // http.createServer(app).listen(app.get('port'), function(){
-  // console.log('Express server listening on port ' + app.get('port'));
+// console.log('Express server listening on port ' + app.get('port'));
 // });
 
 const server = http.createServer(app)

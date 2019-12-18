@@ -28,7 +28,7 @@
     "start": "nodemon ./src/app.js",
     "seed": "make db",
     "test": "make test",
-    "st": "standard ./src/app.js && standard ./src/tests/index.js && standard ./src/routes/*"
+    "st": "standard ./src/app.js && standard ./src/tests/index.js && standard ./src/routes/* && standard ./src/core/**/*"
   },
   "repository": {
     "type": "git",

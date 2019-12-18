@@ -1,24 +1,25 @@
 'use strict'
 
-const MongoClient = require('mongodb').MongoClient;
+const MongoClient = require('mongodb').MongoClient
 
 exports.db = async (url, db) => {
-  let client, result
+  let client
   try {
-    client = await MongoClient.connect(url, {useUnifiedTopology: true, useNewUrlParser: true})
+    client = await MongoClient.connect(url, { useUnifiedTopology: true, useNewUrlParser: true })
     return client.db(db)
-  } catch(err) {
+  } catch (err) {
     console.error(err)
-  } 
+  }
 }
 
 exports.collections = async (db, collections, result) => {
   try {
-    for(let collection of collections) {
-      result[collection] = await db.then(db => db.collection(collection))
-                                    .catch(err => {throw err})
+    for (const collection of collections) {
+      result[collection] = await db
+        .then(db => db.collection(collection))
+        .catch(err => { throw err })
     }
-  } catch(err) {
+  } catch (err) {
     console.error(err)
   }
 }
