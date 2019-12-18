@@ -20,7 +20,7 @@ exports.show = (req, res, next) => {
 
 exports.list = (req, res, next) => {
   mongo.list(req.collections.articles, (err, articles) => {
-    if (err) return next(error)
+    if (err) return next(err)
     res.send({ articles })
   })
 }
@@ -97,7 +97,7 @@ exports.postArticle = (req, res, next) => {
 
 exports.admin = (req, res, next) => {
   mongo.list(req.collections.articles, (err, articles) => {
-    if (err) return next(error)
+    if (err) return next(err)
     res.render('admin', { articles })
   })
 }

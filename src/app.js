@@ -1,9 +1,42 @@
 const express = require('express')
 const http = require('http')
 const path = require('path')
+const everyauth = require('everyauth')
 const mongo = require(path.join(__dirname, './core/db/mongo'))
 const routes = require(path.join(__dirname, './routes'))
 const constants = require(path.join(__dirname, './constants'))
+
+everyauth.debug = true
+
+everyauth.twitter
+  .consumerKey(constants.TWITTER_CONSUMER_KEY)
+  .consumerSecret(constants.TWITTER_CONSUMER_SECRET)
+  .findOrCreateUser((session, accessToken, accessTokenSecret, twitterUserMetadata) => {
+    const promise = new Promise((resolve, reject) => {
+      process.nextTick(() => {
+      if (twitterUserMetadata.screen_name === 'marcopgordillo') {
+        session.user = twitterUserMetadata
+        session.admin = true
+      }
+        resolve(twitterUserMetadata)
+      })
+    })
+    
+    return promise
+    
+    // return twitterUserMetadata
+  })
+  .redirectPath('/admin')
+
+// we need it because otherwise the session will be kept alive
+// the Express.js request is intercepted by Everyauth automatically added /logout
+// and never makes it to our /logout
+everyauth.everymodule.handleLogout(routes.user.logout)
+
+everyauth.everymodule.findUserById((user, callback) => {
+  callback(user)
+})
+
 
 const db = mongo.db(constants.DATABASE_URL, constants.DATABASE_NAME)
 
@@ -17,6 +50,7 @@ const logger = require('morgan')
 const errorHandler = require('errorhandler')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
+var cors = require('cors');
 
 const app = express()
 app.locals.appTitle = 'Blog Express'
@@ -37,10 +71,6 @@ app.set('view engine', 'pug')
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use(methodOverride())
-app.use(require('stylus').middleware(path.join(__dirname, 'public')))
-app.use(express.static(path.join(__dirname, 'public')))
-
 // Other midleware
 app.use(cookieParser('3CCC4ACD-6ED1-4844-9217-82131BDCB239'))
 app.use(session(
@@ -52,6 +82,15 @@ app.use(session(
 ))
 
 // Authentication middleware
+app.use(everyauth.middleware())
+
+app.use(methodOverride())
+app.use(require('stylus').middleware(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'public')))
+app.use(cors({
+  origin: '*'
+}))
+
 app.use((req, res, next) => {
   if (req.session && req.session.admin) {
     res.locals.admin = true
@@ -61,10 +100,9 @@ app.use((req, res, next) => {
 
 // Authorization Middleware
 const authorize = (req, res, next) => {
-  if (req.session && req.session.admin)
+  if (req.session && req.session.admin) {
     return next()
-  else
-    return res.status(401).send()
+  } else return res.status(401).send()
 }
 
 // development only
@@ -98,10 +136,9 @@ app.all('*', (req, res) => {
 // });
 
 const server = http.createServer(app)
-const boot = function () {
-  server.listen(app.get('port'), function () {
-    console.info(`Express server listening on port ${app.get('port')}`)
-  })
+const boot = () => {
+  server.listen(app.get('port'))
+  console.info(`Express server listening on port ${app.get('port')}`)
 }
 const shutdown = function () {
   server.close(process.exit)

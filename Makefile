@@ -13,5 +13,10 @@ test:
 	$(MOCHA_OPTS) \
 	src/tests/*.js
 	echo Ending test
+start:
+	TWITTER_CONSUMER_KEY=ABCABC \
+  TWITTER_CONSUMER_SECRET=XYZXYZXYZ \
+	NODE_ENV=development \
+  node app.js
 
-.PHONY: test db
+.PHONY: test db start

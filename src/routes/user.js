@@ -28,17 +28,18 @@ exports.logout = (req, res, next) => {
  */
 
 exports.authenticate = (req, res, next) => {
-  if (!req.body.email || !req.body.password)
+  if (!req.body.email || !req.body.password) {
     return res.render('login', {
       error: 'Please enter your email and password.'
     })
+  }
 
   req.collections.users.findOne({
     email: req.body.email,
     password: req.body.password
   }, (error, user) => {
     if (error) return next(error)
-    if (!user) return res.render('login', {error: 'Incorrect email&password combination.'})
+    if (!user) return res.render('login', { error: 'Incorrect email&password combination.' })
     req.session.user = user
     req.session.admin = user.admin
     res.redirect('/admin')
