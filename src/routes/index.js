@@ -1,15 +1,15 @@
 exports.article = require('./article')
 exports.user = require('./user')
+const path = require('path')
+const mongo = require(path.join(__dirname, '../core/db/mongo'))
 
 /*
  * GET home page.
  */
 
 exports.index = (req, res, next) => {
-  req.collections.articles
-    .find({ published: true }, { sort: { _id: -1 } })
-    .toArray((error, articles) => {
-      if (error) return next(error)
-      res.render('index', { articles: articles })
-    })
+  mongo.list(req.collections.articles, (err, articles) => {
+    if (err) return next(error)
+    res.render('index', { articles })
+  })
 }

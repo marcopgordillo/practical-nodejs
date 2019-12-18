@@ -29,3 +29,9 @@ exports.close = (client) => {
     client.close()
   }
 }
+
+exports.list = (collection, cb) => {
+  collection
+    .find({ published: true }, { sort: { _id: -1 } })
+    .toArray((err, articles) => cb(err, articles))
+}
