@@ -1,42 +1,34 @@
 const express = require('express')
 const http = require('http')
 const path = require('path')
-const everyauth = require('everyauth')
+var passport = require('passport');
+var Strategy = require('passport-twitter').Strategy;
+var trustProxy = false;
+if (process.env.DYNO) {
+  // Apps on heroku are behind a trusted proxy
+  trustProxy = true;
+}
 const mongo = require(path.join(__dirname, './core/db/mongo'))
 const routes = require(path.join(__dirname, './routes'))
 const constants = require(path.join(__dirname, './constants'))
 
-everyauth.debug = true
+passport.use(new Strategy({
+    consumerKey: constants.TWITTER_CONSUMER_KEY,
+    consumerSecret: constants.TWITTER_CONSUMER_SECRET,
+    callbackURL: 'https://3000-e63fdfbd-390c-48bf-a337-9e9f620c0a65.ws-us02.gitpod.io/auth/twitter/callback',
+    proxy: trustProxy
+  },
+  function(token, tokenSecret, profile, cb) {
+    return cb(null, profile)
+  }))
 
-everyauth.twitter
-  .consumerKey(constants.TWITTER_CONSUMER_KEY)
-  .consumerSecret(constants.TWITTER_CONSUMER_SECRET)
-  .findOrCreateUser((session, accessToken, accessTokenSecret, twitterUserMetadata) => {
-    const promise = new Promise((resolve, reject) => {
-      process.nextTick(() => {
-      if (twitterUserMetadata.screen_name === 'marcopgordillo') {
-        session.user = twitterUserMetadata
-        session.admin = true
-      }
-        resolve(twitterUserMetadata)
-      })
-    })
-    
-    return promise
-    
-    // return twitterUserMetadata
-  })
-  .redirectPath('/admin')
+passport.serializeUser(function(user, cb) {
+  cb(null, user);
+});
 
-// we need it because otherwise the session will be kept alive
-// the Express.js request is intercepted by Everyauth automatically added /logout
-// and never makes it to our /logout
-everyauth.everymodule.handleLogout(routes.user.logout)
-
-everyauth.everymodule.findUserById((user, callback) => {
-  callback(user)
-})
-
+passport.deserializeUser(function(obj, cb) {
+  cb(null, obj);
+});
 
 const db = mongo.db(constants.DATABASE_URL, constants.DATABASE_NAME)
 
@@ -82,14 +74,13 @@ app.use(session(
 ))
 
 // Authentication middleware
-app.use(everyauth.middleware())
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(methodOverride())
 app.use(require('stylus').middleware(path.join(__dirname, 'public')))
 app.use(express.static(path.join(__dirname, 'public')))
-app.use(cors({
-  origin: '*'
-}))
+app.use(cors({ origin: '*' }))
 
 app.use((req, res, next) => {
   if (req.session && req.session.admin) {
@@ -114,14 +105,35 @@ if (app.get('env') === 'development') {
 app.get('/', routes.index)
 app.get('/login', routes.user.login)
 app.post('/login', routes.user.authenticate)
+app.get('/login/twitter', passport.authenticate('twitter'))
+app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/login' }), (req, res) => {
+  /*const promise = new Promise((resolve, reject) => {
+      process.nextTick(() => {
+        if (profile.screen_name === 'marcopgordillo') {
+          console.log(profile.screen_name)
+          session.user = profile
+          session.admin = true
+        }
+        resolve(profile)
+      })
+    })*/
+
+    if (req.user.username === 'marcopgordillo') {
+      req.session.user = req.user
+      req.session.admin = true
+    }
+    res.redirect('/admin')
+  })
+app.get('/profile', require('connect-ensure-login').ensureLoggedIn(),
+  (req, res) => res.render('profile', { user: req.user }))
 app.get('/logout', routes.user.logout)
-app.get('/admin', authorize, routes.article.admin)
-app.get('/post', authorize, routes.article.post)
-app.post('/post', authorize, routes.article.postArticle)
+app.get('/admin', require('connect-ensure-login').ensureLoggedIn(), routes.article.admin)
+app.get('/post', require('connect-ensure-login').ensureLoggedIn(), routes.article.post)
+app.post('/post', require('connect-ensure-login').ensureLoggedIn(), routes.article.postArticle)
 app.get('/articles/:slug', routes.article.show)
 
 // REST API routes
-app.all('/api', authorize)
+app.all('/api', require('connect-ensure-login').ensureLoggedIn())
 app.get('/api/articles', routes.article.list)
 app.post('/api/articles', routes.article.add)
 app.put('/api/articles/:id', routes.article.edit)

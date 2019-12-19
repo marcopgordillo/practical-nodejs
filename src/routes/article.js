@@ -60,7 +60,7 @@ exports.edit = (req, res, next) => {
 
 exports.del = (req, res, next) => {
   if (!req.params.id) return next(new Error('No article ID.'))
-  req.collections.articles.removeById(req.params.id, (error, count) => {
+  req.collections.articles.deleteOne({ _id: new ObjectID(req.params.id) }, (error, count) => {
     if (error) return next(error)
     res.send({ affectedCount: count })
   })
