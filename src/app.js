@@ -1,14 +1,13 @@
 const express = require('express')
 const http = require('http')
 const path = require('path')
-var passport = require('passport');
-var Strategy = require('passport-twitter').Strategy;
-var trustProxy = false;
+var passport = require('passport')
+var Strategy = require('passport-twitter').Strategy
+var trustProxy = false
 if (process.env.DYNO) {
   // Apps on heroku are behind a trusted proxy
-  trustProxy = true;
+  trustProxy = true
 }
-//const mongo = require(path.join(__dirname, './core/db/mongo'))
 const mongoose = require('mongoose')
 const models = require(path.join(__dirname, './db/models'))
 const routes = require(path.join(__dirname, './routes'))
@@ -19,29 +18,22 @@ const {
   TWITTER_CONSUMER_SECRET
 } = require(path.join(__dirname, './constants'))
 
-passport.use(new Strategy({
+passport.use(new Strategy(
+  {
     consumerKey: TWITTER_CONSUMER_KEY,
     consumerSecret: TWITTER_CONSUMER_SECRET,
     callbackURL: 'https://3000-e63fdfbd-390c-48bf-a337-9e9f620c0a65.ws-us02.gitpod.io/auth/twitter/callback',
     proxy: trustProxy
   },
-  function(token, tokenSecret, profile, cb) {
-    return cb(null, profile)
-  }))
+  (token, tokenSecret, profile, cb) => cb(null, profile)
+))
 
-passport.serializeUser(function(user, cb) {
-  cb(null, user);
-});
+passport.serializeUser((user, cb) => cb(null, user))
 
-passport.deserializeUser(function(obj, cb) {
-  cb(null, obj);
-});
+passport.deserializeUser((obj, cb) => cb(null, obj))
 
-//const db = mongo.db(constants.DATABASE_URL, constants.DATABASE_NAME)
-//const collections = {}
-//mongo.collections(db, ['articles', 'users'], collections)
 const dbUrl = `${DATABASE_URL}/${DATABASE_NAME}`
-const db = mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
@@ -49,7 +41,7 @@ const logger = require('morgan')
 const errorHandler = require('errorhandler')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
-var cors = require('cors');
+var cors = require('cors')
 
 const app = express()
 app.locals.appTitle = 'Blog Express'
@@ -81,8 +73,8 @@ app.use(session(
 ))
 
 // Authentication middleware
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use(methodOverride())
 app.use(require('stylus').middleware(path.join(__dirname, 'public')))
@@ -96,13 +88,6 @@ app.use((req, res, next) => {
   next()
 })
 
-// Authorization Middleware
-const authorize = (req, res, next) => {
-  if (req.session && req.session.admin) {
-    return next()
-  } else return res.status(401).send()
-}
-
 // development only
 if (app.get('env') === 'development') {
   app.use(errorHandler('dev'))
@@ -114,7 +99,7 @@ app.get('/login', routes.user.login)
 app.post('/login', routes.user.authenticate)
 app.get('/login/twitter', passport.authenticate('twitter'))
 app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedirect: '/login' }), (req, res) => {
-  /*const promise = new Promise((resolve, reject) => {
+  /* const promise = new Promise((resolve, reject) => {
       process.nextTick(() => {
         if (profile.screen_name === 'marcopgordillo') {
           console.log(profile.screen_name)
@@ -123,14 +108,14 @@ app.get('/auth/twitter/callback', passport.authenticate('twitter', { failureRedi
         }
         resolve(profile)
       })
-    })*/
+    }) */
 
-    if (req.user.username === 'marcopgordillo') {
-      req.session.user = req.user
-      req.session.admin = true
-    }
-    res.redirect('/admin')
-  })
+  if (req.user.username === 'marcopgordillo') {
+    req.session.user = req.user
+    req.session.admin = true
+  }
+  res.redirect('/admin')
+})
 app.get('/profile', require('connect-ensure-login').ensureLoggedIn(),
   (req, res) => res.render('profile', { user: req.user }))
 app.get('/logout', routes.user.logout)

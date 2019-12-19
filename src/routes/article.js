@@ -1,13 +1,10 @@
-const path = require('path')
-//ObjectID = require('mongodb').ObjectID
-//const mongo = require(path.join(__dirname, '../core/db/mongo'))
 /*
  * GET article page.
  */
 
 exports.show = (req, res, next) => {
   if (!req.params.slug) return next(new Error('No article slug.'))
-  req.models.Article.findOne({slug: req.params.slug}, (error, article) => {
+  req.models.Article.findOne({ slug: req.params.slug }, (error, article) => {
     if (error) return next(error)
     if (!article.published && !req.session.admin) return res.status(401).send()
     res.render('article', article)
@@ -21,7 +18,7 @@ exports.show = (req, res, next) => {
 exports.list = (req, res, next) => {
   req.models.Article.list((error, articles) => {
     if (error) return next(error)
-    res.send({articles: articles})
+    res.send({ articles })
   })
 }
 
@@ -55,11 +52,11 @@ exports.edit = (req, res, next) => {
       res.send(savedDoc)
     })
   })
-  // req.models.Article.findByIdAndUpdate(req.params.id, {$set: req.body.article}, function(error, doc) {
-    // if (error) return next(error)
-    // res.send(doc)
-  // })
-  }
+  /* req.models.Article.findByIdAndUpdate(req.params.id, {$set: req.body.article}, function(error, doc) {
+    if (error) return next(error)
+    res.send(doc)
+  }) */
+}
 
 /*
  * DELETE article API.
@@ -75,10 +72,10 @@ exports.del = (req, res, next) => {
       res.send(doc)
     })
   })
-  // req.models.Article.findByIdAndRemove(req.params.id, function(error, doc) {
-    // if (error) return next(error);
-    // res.send(doc);
-  // });
+  /* req.models.Article.findByIdAndRemove(req.params.id, function(error, doc) {
+    if (error) return next(error)
+    res.send(doc)
+  }) */
 }
 
 /*
@@ -95,7 +92,7 @@ exports.post = (req, res, next) => {
 
 exports.postArticle = (req, res, next) => {
   if (!req.body.title || !req.body.slug || !req.body.text) {
-    return res.render('post', {error: 'Fill title, slug and text.'})
+    return res.render('post', { error: 'Fill title, slug and text.' })
   }
   var article = {
     title: req.body.title,
@@ -105,7 +102,7 @@ exports.postArticle = (req, res, next) => {
   }
   req.models.Article.create(article, (error, articleResponse) => {
     if (error) return next(error)
-    res.render('post', {error: 'Article was added. Publish it on Admin page.'})
+    res.render('post', { error: 'Article was added. Publish it on Admin page.' })
   })
 }
 
@@ -116,6 +113,6 @@ exports.postArticle = (req, res, next) => {
 exports.admin = (req, res, next) => {
   req.models.Article.list((error, articles) => {
     if (error) return next(error)
-    res.render('admin', {articles: articles})
+    res.render('admin', { articles: articles })
   })
 }

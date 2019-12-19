@@ -13,7 +13,7 @@ const before = mocha.before
 const path = require('path')
 
 // TODO: seed from the test and then clean up
-const seedArticles = require(path.join(__dirname, '../db/articles.json'))
+const seedArticles = require(path.join(__dirname, '../db/seeds/articles.json'))
 // const seedUsers = require('../db/users.json')
 
 describe('server', () => {
