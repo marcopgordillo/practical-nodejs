@@ -1,8 +1,10 @@
 extends layout
 block page
   - var menu = 'post'
-block content
-  
+block alert
+  if error
+    div.alert.alert-warning= error
+block content  
     h2 Post an Article
     div= error
     div.col-md-8
