@@ -9,8 +9,8 @@ const userSchema = new mongoose.Schema(
         return value.trim().toLowerCase()
       },
       validate: [
-        email => 
-          (email.match(/[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-­9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-­9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i) != null),
+        email =>
+          (email.match(/[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-­9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-­9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/i) != null),
         'Invalid email'
       ]
     },

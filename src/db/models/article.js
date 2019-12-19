@@ -22,8 +22,8 @@ const articleSchema = new mongoose.Schema(
 
 articleSchema.static(
   {
-    list: function(callback) {
-      this.find({}, null, {sort: {_id: -1}}, callback)
+    list: function (callback) {
+      this.find({}, null, { sort: { _id: -1 } }, callback)
     }
   }
 )
