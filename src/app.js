@@ -8,13 +8,20 @@ if (process.env.DYNO) {
   // Apps on heroku are behind a trusted proxy
   trustProxy = true;
 }
-const mongo = require(path.join(__dirname, './core/db/mongo'))
+//const mongo = require(path.join(__dirname, './core/db/mongo'))
+const mongoose = require('mongoose')
+const models = require(path.join(__dirname, './db/models'))
 const routes = require(path.join(__dirname, './routes'))
-const constants = require(path.join(__dirname, './constants'))
+const {
+  DATABASE_URL,
+  DATABASE_NAME,
+  TWITTER_CONSUMER_KEY,
+  TWITTER_CONSUMER_SECRET
+} = require(path.join(__dirname, './constants'))
 
 passport.use(new Strategy({
-    consumerKey: constants.TWITTER_CONSUMER_KEY,
-    consumerSecret: constants.TWITTER_CONSUMER_SECRET,
+    consumerKey: TWITTER_CONSUMER_KEY,
+    consumerSecret: TWITTER_CONSUMER_SECRET,
     callbackURL: 'https://3000-e63fdfbd-390c-48bf-a337-9e9f620c0a65.ws-us02.gitpod.io/auth/twitter/callback',
     proxy: trustProxy
   },
@@ -30,11 +37,11 @@ passport.deserializeUser(function(obj, cb) {
   cb(null, obj);
 });
 
-const db = mongo.db(constants.DATABASE_URL, constants.DATABASE_NAME)
-
-const collections = {}
-
-mongo.collections(db, ['articles', 'users'], collections)
+//const db = mongo.db(constants.DATABASE_URL, constants.DATABASE_NAME)
+//const collections = {}
+//mongo.collections(db, ['articles', 'users'], collections)
+const dbUrl = `${DATABASE_URL}/${DATABASE_NAME}`
+const db = mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
@@ -47,10 +54,10 @@ var cors = require('cors');
 const app = express()
 app.locals.appTitle = 'Blog Express'
 
-// Expose collections to request handlers
+// Expose models to request handlers
 app.use((req, res, next) => {
-  if (!collections.articles || !collections.users) return next(new Error('No collections.'))
-  req.collections = collections
+  if (!models.Article || !models.User) return next(new Error('No Models.'))
+  req.models = models
   return next()
 })
 
