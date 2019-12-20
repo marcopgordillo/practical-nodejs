@@ -39,7 +39,6 @@ const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const logger = require('morgan')
 const errorHandler = require('errorhandler')
-const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
 var cors = require('cors')
 
@@ -60,8 +59,8 @@ app.set('view engine', 'pug')
 
 // Express.js middleware configuration
 app.use(logger('dev'))
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 // Other midleware
 app.use(cookieParser('3CCC4ACD-6ED1-4844-9217-82131BDCB239'))
 app.use(session(
