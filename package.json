@@ -1,0 +1,45 @@
+{
+  "name": "practical-nodejs",
+  "version": "1.0.0",
+  "description": "Practical Nodejs Book",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "errorhandler": "^1.5.1",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "method-override": "^3.0.0",
+    "mongodb": "^3.4.0",
+    "morgan": "^1.9.1",
+    "pug": "^2.0.4",
+    "serve-favicon": "^2.5.0",
+    "stylus": "^0.54.7",
+    "ws": "^7.2.1"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "express-generator": "^4.16.1",
+    "mocha": "^6.2.2",
+    "nodemon": "^2.0.2",
+    "standard": "^14.3.1",
+    "superagent": "^5.1.2"
+  },
+  "scripts": {
+    "start": "nodemon ./src",
+    "seed": "make db",
+    "test": "make test",
+    "st": "standard ./src/app.js && standard ./src/tests/index.js && standard ./src/routes/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcopgordillo/practical-nodejs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/marcopgordillo/practical-nodejs/issues"
+  },
+  "homepage": "https://github.com/marcopgordillo/practical-nodejs#readme"
+}
