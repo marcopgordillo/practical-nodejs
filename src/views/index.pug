@@ -1,14 +1,21 @@
 extends layout
 
-block page 
-  - var menu = 'index'
 block content
-  if (articles.length === 0)
-    | There's no published content yet. 
-    a(href="/login") Log in
-    |  to post and publish.
-  else 
-    each article, index in articles
-      div
-        h2
-          a(href=`/articles/${article.slug}`)= article.title
+  h1= title
+  p Welcome to 
+    span.received-message #{title}
+  input.message(type='text', placeholder='what is on your mind?', onkeyup='send(this)')
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.slim.js")
+  script.
+    var socket = io.connect('https://3000-e63fdfbd-390c-48bf-a337-9e9f620c0a65.ws-us02.gitpod.io/')
+    socket.on('receive', (message) => {
+      console.log('received %s', message)
+      document.querySelector('.received-message').innerText = message
+    })
+
+    var send = (input) => {
+      console.log(input.value)
+      var value = input.value
+      console.log('sending %s to server', value)
+      socket.emit('messageChange', { message: value })
+    }
