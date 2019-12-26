@@ -141,6 +141,13 @@ app.get('/api/articles', routes.article.list)
 app.post('/api/articles', routes.article.add)
 app.put('/api/articles/:id', routes.article.edit)
 app.delete('/api/articles/:id', routes.article.del)
+app.get('/status', (req, res) => {
+  res.send({
+    pid: process.pid,
+    memory: process.memoryUsage(),
+    uptime: process.uptime()
+  })
+})
 
 app.all('*', (req, res) => {
   res.status(404).send()
