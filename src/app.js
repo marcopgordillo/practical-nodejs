@@ -37,6 +37,8 @@ mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
+const redis = require('redis')
+const RedisStore = require('connect-redis')(session)
 const logger = require('morgan')
 const errorHandler = require('errorhandler')
 const methodOverride = require('method-override')
@@ -63,13 +65,27 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 // Other midleware
 app.use(cookieParser('3CCC4ACD-6ED1-4844-9217-82131BDCB239'))
-app.use(session(
-  {
-    secret: '2C44774A-D649-4D44-9535-46E296EF984F',
-    resave: true,
-    saveUninitialized: true
-  }
-))
+if (process.env.NODE_ENV === 'development') {
+  app.use(errorHandler({
+    dumpExceptions: true,
+    showStack: true
+  }))
+  app.use(session(
+    {
+      secret: '2C44774A-D649-4D44-9535-46E296EF984F',
+      resave: true,
+      saveUninitialized: true
+    }
+  ))
+} else if (process.env.NODE_ENV === 'production') {
+  client = redis.createClient()
+  app.use(errorHandler())
+  app.use(session({
+    store: new RedisStore({ client }),
+    secret: process.env.SESSION_SECRET,
+    resave: false
+  }))
+}
 
 // Authentication middleware
 app.use(passport.initialize())
@@ -86,11 +102,6 @@ app.use((req, res, next) => {
   }
   next()
 })
-
-// development only
-if (app.get('env') === 'development') {
-  app.use(errorHandler('dev'))
-}
 
 // Pages and routes
 app.get('/', routes.index)
