@@ -1,5 +1,6 @@
 exports.article = require('./article')
 exports.user = require('./user')
+exports.status = require('./status')
 
 /*
  * GET home page.
