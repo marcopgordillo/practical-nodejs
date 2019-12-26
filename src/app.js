@@ -83,7 +83,8 @@ if (process.env.NODE_ENV === 'development') {
   app.use(session({
     store: new RedisStore({ client }),
     secret: process.env.SESSION_SECRET,
-    resave: false
+    resave: false,
+    saveUninitialized: true
   }))
 }
 
@@ -153,10 +154,17 @@ const server = http.createServer(app)
 const boot = () => {
   server.listen(app.get('port'))
   console.info(`Express server listening on port ${app.get('port')}`)
+
+  process.on('uncaughtException', (err) => {
+    console.error('uncaughtException: ', err.message)
+    console.error(err.stack)
+    process.exit(1) // 1 is for errors, 0 is okay
+  })
 }
 const shutdown = function () {
   server.close(process.exit)
 }
+
 if (require.main === module) {
   boot()
 } else {

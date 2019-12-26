@@ -18,6 +18,7 @@
     "morgan": "^1.9.1",
     "passport": "^0.4.1",
     "passport-twitter": "^1.0.4",
+    "pm2": "^4.2.1",
     "pug": "^2.0.4",
     "redis": "^2.8.0",
     "serve-favicon": "^2.5.0",
@@ -33,7 +34,8 @@
   },
   "scripts": {
     "start": "nodemon ./src/app.js",
-    "prod": "NODE_ENV=production node ./src/app.js",
+    "prod": "NODE_ENV=production pm2-docker start ./src/app.js -i 0 --name 'node-app'",
+    "stop": "pm2 stop node-app",
     "seed": "make db",
     "test": "make test",
     "st": "standard ./src/app.js && standard ./src/tests/index.js && standard ./src/routes/* && standard ./src/db/models/* && standard ./src/core/**/*"
