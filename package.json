@@ -33,7 +33,7 @@
     "superagent": "^5.1.2"
   },
   "scripts": {
-    "start": "nodemon ./src/app.js",
+    "start": "make start",
     "prod": "NODE_ENV=production pm2-docker start ./src/app.js -i 0 --name 'node-app'",
     "stop": "pm2 stop node-app",
     "seed": "make db",

@@ -14,9 +14,12 @@ test:
 	src/tests/*.js
 	echo Ending test
 start:
-	TWITTER_CONSUMER_KEY=ABCABC \
-  TWITTER_CONSUMER_SECRET=XYZXYZXYZ \
-	NODE_ENV=development \
-  node app.js
+ifeq ($(NODE_ENV), production)
+	$(info production) \
+	./node_modules/.bin/pm2-docker start ./src/app.js -i 0 --name 'node-app'
+else
+	$(info development) \
+	./node_modules/.bin/nodemon ./src/app.js
+endif
 
 .PHONY: test db start
