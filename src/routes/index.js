@@ -1,16 +1,18 @@
 exports.article = require('./article')
 exports.user = require('./user')
+exports.status = require('./status')
 
 /*
  * GET home page.
  */
 
-exports.index = (req, res, next) => {
-  
-  req.collections.articles
-    .find({published: true}, {sort: {_id: -1}})
-    .toArray((error, articles) => {
+exports.index = (req, res, next) =>
+  req.models.Article.find(
+    { published: true },
+    null,
+    { sort: { _id: -1 } },
+    (error, articles) => {
       if (error) return next(error)
-      res.render('index', {articles: articles})
-  })
-}
+      res.render('index', { articles: articles })
+    }
+  )

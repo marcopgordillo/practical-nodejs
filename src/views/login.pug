@@ -7,10 +7,12 @@ block content
     div= error
     div
       form(action="/login", method="POST")
-        p
-          input.form-control(name="email", type="text", placeholder="hi@node.university")
-        p
-          input.form-control(name="password", type="password", placeholder="***")
-        p
+        .form-group
+          label(for="email") Email
+          input#email.form-control(name="email", type="text", placeholder="hi@node.university")
+        .form-group
+          label(for="password") Password
+          input#password.form-control(name="password", type="password", placeholder="***")
+        .form-group
           button.btn.btn-lg.btn-primary.btn-block(type="submit") Log in
           

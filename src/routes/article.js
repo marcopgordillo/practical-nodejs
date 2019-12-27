@@ -4,9 +4,9 @@
 
 exports.show = (req, res, next) => {
   if (!req.params.slug) return next(new Error('No article slug.'))
-  req.collections.articles.findOne({slug: req.params.slug}, (error, article) => {
+  req.models.Article.findOne({ slug: req.params.slug }, (error, article) => {
     if (error) return next(error)
-    if (!article.published) return res.status(401).send()
+    if (!article.published && !req.session.admin) return res.status(401).send()
     res.render('article', article)
   })
 }
@@ -16,9 +16,9 @@ exports.show = (req, res, next) => {
  */
 
 exports.list = (req, res, next) => {
-  req.collections.articles.find({}).toArray((error, articles) => {
+  req.models.Article.list((error, articles) => {
     if (error) return next(error)
-    res.send({articles: articles})
+    res.send({ articles })
   })
 }
 
@@ -28,9 +28,9 @@ exports.list = (req, res, next) => {
 
 exports.add = (req, res, next) => {
   if (!req.body.article) return next(new Error('No article payload.'))
-  let article = req.body.article
+  var article = req.body.article
   article.published = false
-  req.collections.articles.insert(article, (error, articleResponse) => {
+  req.models.Article.create(article, (error, articleResponse) => {
     if (error) return next(error)
     res.send(articleResponse)
   })
@@ -42,10 +42,20 @@ exports.add = (req, res, next) => {
 
 exports.edit = (req, res, next) => {
   if (!req.params.id) return next(new Error('No article ID.'))
-  req.collections.articles.updateById(req.params.id, {$set: req.body.article}, (error, count) => {
+  if (!req.body.article) return next(new Error('No article payload.'))
+  req.models.Article.findById(req.params.id, (error, article) => {
     if (error) return next(error)
-    res.send({affectedCount: count})
+    if (!article) return next(new Error('No article ID.'))
+    article.set(req.body.article)
+    article.save((error, savedDoc) => {
+      if (error) return next(error)
+      res.send(savedDoc)
+    })
   })
+  /* req.models.Article.findByIdAndUpdate(req.params.id, {$set: req.body.article}, function(error, doc) {
+    if (error) return next(error)
+    res.send(doc)
+  }) */
 }
 
 /*
@@ -54,10 +64,18 @@ exports.edit = (req, res, next) => {
 
 exports.del = (req, res, next) => {
   if (!req.params.id) return next(new Error('No article ID.'))
-  req.collections.articles.removeById(req.params.id, (error, count) => {
+  req.models.Article.findById(req.params.id, (error, article) => {
     if (error) return next(error)
-    res.send({affectedCount: count})
+    if (!article) return next(new Error('Article not found.'))
+    article.remove((error, doc) => {
+      if (error) return next(error)
+      res.send(doc)
+    })
   })
+  /* req.models.Article.findByIdAndRemove(req.params.id, function(error, doc) {
+    if (error) return next(error)
+    res.send(doc)
+  }) */
 }
 
 /*
@@ -74,17 +92,17 @@ exports.post = (req, res, next) => {
 
 exports.postArticle = (req, res, next) => {
   if (!req.body.title || !req.body.slug || !req.body.text) {
-    return res.render('post', {error: 'Fill title, slug and text.'})
+    return res.render('post', { error: 'Fill title, slug and text.' })
   }
-  const article = {
+  var article = {
     title: req.body.title,
     slug: req.body.slug,
     text: req.body.text,
     published: false
   }
-  req.collections.articles.insert(article, (error, articleResponse) => {
+  req.models.Article.create(article, (error, articleResponse) => {
     if (error) return next(error)
-    res.render('post', {error: 'Article was added. Publish it on Admin page.'})
+    res.render('post', { error: 'Article was added. Publish it on Admin page.' })
   })
 }
 
@@ -93,8 +111,8 @@ exports.postArticle = (req, res, next) => {
  */
 
 exports.admin = (req, res, next) => {
-  req.collections.articles.find({}, {sort: {_id: -1}}).toArray((error, articles) => {
+  req.models.Article.list((error, articles) => {
     if (error) return next(error)
-    res.render('admin', {articles: articles})
+    res.render('admin', { articles: articles })
   })
 }

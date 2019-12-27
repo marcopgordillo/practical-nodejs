@@ -53,5 +53,5 @@ var update = function (event) {
 $(document).ready(function () {
   var $element = $('.admin tbody')
   $element.on('click', 'button.remove', remove)
-  $element.on('click', 'button', update)
+  $element.on('click', 'button.publish', update)
 })

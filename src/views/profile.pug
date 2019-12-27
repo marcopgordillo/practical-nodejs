@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  .row
+    .col-xs-12
+      h1 Profile
+      p User: #{user.username}
+      p Name: #{user.displayName}
+      if (user.emails && user.emails.length > 0)
+        p=  user.emails[0]
