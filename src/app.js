@@ -23,7 +23,7 @@ passport.use(new Strategy(
   {
     consumerKey: TWITTER_CONSUMER_KEY,
     consumerSecret: TWITTER_CONSUMER_SECRET,
-    callbackURL: 'https://3000-e63fdfbd-390c-48bf-a337-9e9f620c0a65.ws-us02.gitpod.io/auth/twitter/callback',
+    callbackURL: 'https://hidden-inlet-67405.herokuapp.com/auth/twitter/callback',
     proxy: trustProxy
   },
   (token, tokenSecret, profile, cb) => cb(null, profile)
