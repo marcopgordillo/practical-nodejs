@@ -15,7 +15,8 @@ const {
   DATABASE_URL,
   DATABASE_NAME,
   TWITTER_CONSUMER_KEY,
-  TWITTER_CONSUMER_SECRET
+  TWITTER_CONSUMER_SECRET,
+  REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD
 } = require(path.join(__dirname, './constants'))
 
 passport.use(new Strategy(
@@ -78,7 +79,12 @@ if (process.env.NODE_ENV === 'development') {
     }
   ))
 } else if (process.env.NODE_ENV === 'production') {
-  client = redis.createClient()
+  client = redis.createClient({
+    host: REDIS_HOST,
+    port: REDIS_PORT,
+    user: REDIS_USER,
+    password: REDIS_PASSWORD
+  })
   app.use(errorHandler())
   app.use(session({
     store: new RedisStore({ client }),
